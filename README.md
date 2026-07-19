@@ -1,35 +1,63 @@
-# WebByte Studio — Impressum-Tag (`.studio-badge`)
+# webbytestudio-tag
 
-Isolierte, wiederverwendbare „gebaut von WebByte Studio"-Badge, wie sie im
-Impressum eingesetzt wird. 1:1 aus dem `ethikseite`-Projekt extrahiert und
-eigenständig gemacht — es werden **keine** externen CSS-Variablen oder
-Frameworks benötigt.
+Zentral verwaltete „gebaut von WebByte Studio"-Badge fürs Impressum.
+Gehostet unter **[tag.timonsh.dev](https://tag.timonsh.dev)** — jedes Projekt bindet
+sie von dort ein, sodass ein Update hier automatisch überall greift.
+
+## Einbinden (empfohlen — zentral)
+
+Zwei Zeilen ins Zielprojekt:
+
+```html
+<!-- einmal im <head> (oder vor </body>) -->
+<script src="https://tag.timonsh.dev/tag.js" defer></script>
+
+<!-- an der Stelle, an der die Badge erscheinen soll -->
+<div data-webbyte-studio-tag></div>
+```
+
+`tag.js` lädt `studio-badge.css` (einmalig) und rendert die Badge in jeden
+`[data-webbyte-studio-tag]`-Mountpunkt. Bild und Text kommen ebenfalls von hier.
+Nichts weiter kopieren.
+
+## Zentral updaten
+
+Alles wird in diesem Repo gepflegt; nach dem Deploy ist es auf allen Seiten aktuell:
+
+| Ändern von … | Datei |
+|--------------|-------|
+| Aussehen (Farben, Abstände, Animation) | `studio-badge.css` |
+| Markup / Text / Links | `tag.js` (`BADGE_HTML`) |
+| Avatar | `timon-profile.webp` |
 
 ## Dateien
 
 | Datei | Zweck |
 |-------|-------|
-| `studio-badge.html` | HTML-Snippet zum Einfügen (z. B. am Ende des Impressums) |
-| `studio-badge.css`  | Eigenständige Styles (Farben/Abstände/Font fest hinterlegt) |
-| `timon-profile.webp`| Avatar (144×144) |
-| `index.html`        | Standalone-Vorschau / Demo |
+| `tag.js` | Embed-Skript (Loader + Markup) — der zentrale Einstieg |
+| `studio-badge.css` | Eigenständige Styles (keine externen Variablen nötig) |
+| `timon-profile.webp` | Avatar (144×144) |
+| `studio-badge.html` | Statisches Markup-Snippet (No-JS-Alternative) |
+| `index.html` | Standalone-Vorschau / Demo |
+
+## No-JS-Alternative
+
+Wer die Badge lieber statisch einbaut, verlinkt die CSS und kopiert das Snippet
+aus `studio-badge.html` (Bild-`src` auf `https://tag.timonsh.dev/timon-profile.webp`
+setzen):
+
+```html
+<link rel="stylesheet" href="https://tag.timonsh.dev/studio-badge.css">
+```
 
 ## Vorschau
 
 `index.html` im Browser öffnen — zeigt das Tag 1:1 auf hellem Hintergrund.
 
-## In ein Projekt einbauen
-
-1. `studio-badge.css` einbinden (verlinken oder Inhalt in die Projekt-CSS kopieren).
-2. `timon-profile.webp` ins Projekt kopieren und den `<img src>`-Pfad im Snippet
-   an den eigenen Asset-Pfad anpassen.
-3. Das Markup aus `studio-badge.html` an die gewünschte Stelle setzen.
+---
 
 Die Komponente ist ein in sich geschlossener, dunkler „Terminal"-Balken mit
-blauem Glow und dezent pulsierendem Avatar (respektiert
-`prefers-reduced-motion`). Alle Links zeigen auf <https://timonsh.dev>.
-
-> Hinweis: Die Mono-Schrift ist auf allen Textelementen explizit gesetzt, damit
-> ein globales `* { font-family: … }` des Host-Projekts das Aussehen nicht
-> verändert.
-# webbytestudio-tag
+blauem Glow und dezent pulsierendem Avatar (respektiert `prefers-reduced-motion`).
+Alle Links zeigen auf <https://timonsh.dev>. Die Mono-Schrift ist auf allen
+Textelementen explizit gesetzt, damit ein globales `* { font-family: … }` des
+Host-Projekts das Aussehen nicht verändert.
