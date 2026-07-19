@@ -1,0 +1,96 @@
+/* ============================================================================
+   WebByte Studio — "gebaut von" Impressum-Tag  (.studio-badge)
+   ----------------------------------------------------------------------------
+   Isolierte, eigenständige Komponente. 1:1 aus dem ethikseite-Projekt
+   extrahiert; alle CSS-Variablen des ursprünglichen Design-Systems wurden zu
+   festen Werten aufgelöst, damit die Komponente ohne Abhängigkeiten in jedem
+   Projekt identisch aussieht. Die font-family ist zusätzlich explizit auf allen
+   Textelementen gesetzt, damit ein globales `* { font-family }` des Hosts sie
+   nicht überschreibt.
+   ============================================================================ */
+
+.studio-badge {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 4.5rem;
+    padding: 0.7rem 1.05rem;
+    border: 1px solid #243450;
+    border-radius: 14px;
+    background: #0a0f1d;
+    color: #c7d2e0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+    line-height: 1.5;
+    box-shadow: 0 14px 38px rgba(6, 10, 22, .45);
+}
+
+.studio-badge::before {
+    /* aura: blauer radialer Glow + feines Tech-Grid */
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(130% 160% at 93% 50%, rgba(91, 120, 255, .32), transparent 58%),
+        radial-gradient(90% 130% at -5% -30%, rgba(91, 120, 255, .12), transparent 55%),
+        linear-gradient(rgba(120, 150, 255, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120, 150, 255, .045) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 22px 22px, 22px 22px;
+}
+
+.studio-badge__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.studio-badge__line,
+.studio-badge__meta,
+.studio-badge__prompt,
+.studio-badge a {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.studio-badge__line { margin: 0; color: #e8edf7; }
+.studio-badge__prompt { color: #6b8bff; font-weight: 700; margin-right: .4em; }
+.studio-badge__meta { margin: 0; color: #74859f; font-size: .85em; }
+.studio-badge a { color: #83a0ff; text-decoration: none; font-weight: 700; }
+.studio-badge a:hover { color: #aabcff; text-decoration: underline; }
+.studio-badge__meta a { font-weight: 600; }
+
+.studio-badge__avatar {
+    flex: none;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 11px;
+    overflow: hidden;
+    border: 1px solid rgba(91, 120, 255, .5);
+    box-shadow: 0 0 0 3px rgba(91, 120, 255, .10), 0 0 24px rgba(60, 90, 255, .5);
+}
+
+.studio-badge__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .studio-badge__avatar {
+        transition: transform .2s ease;
+        animation: studio-aura 3.4s ease-in-out infinite;
+    }
+    .studio-badge__avatar:hover { transform: translateY(-1px) scale(1.04); }
+    @keyframes studio-aura {
+        0%, 100% { box-shadow: 0 0 0 3px rgba(91, 120, 255, .10), 0 0 16px rgba(60, 90, 255, .4); }
+        50%      { box-shadow: 0 0 0 3px rgba(91, 120, 255, .17), 0 0 32px rgba(60, 90, 255, .8); }
+    }
+}
