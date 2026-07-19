@@ -1,15 +1,51 @@
 <!--
-  WebByte Studio — "gebaut von" Impressum-Tag
+  WebByte Studio — "gebaut von" Impressum-Tag  (statische No-JS-Variante)
   Snippet an die gewünschte Stelle einfügen (z. B. ans Ende des Impressums).
-  Benötigt: studio-badge.css und das Avatarbild (timon-profile.webp).
-  Den <img src> ggf. an den Asset-Pfad des Zielprojekts anpassen.
+  Benötigt: studio-badge.css, timon-profile.webp und webbyte-mark.webp.
+  Die <img src> ggf. an den Asset-Pfad des Zielprojekts anpassen (oder auf
+  https://tag.timonsh.dev/… zeigen lassen).
+
+  Ohne JS: CSS-Ember-Flammen, blinkender Caret, alle Hover-Effekte.
+  Mit tag.js (optional) zusätzlich: Balatro-Canvas-Flammen, Typewriter, Tilt.
 -->
 <aside class="studio-badge" aria-label="Erstellt von WebByte Studio">
-  <div class="studio-badge__text">
-    <p class="studio-badge__line"><span class="studio-badge__prompt">&#10095;</span> gebaut von <a href="https://timonsh.dev" rel="noopener">WebByte&nbsp;Studio</a></p>
-    <p class="studio-badge__meta">timon schroth &middot; frontend&nbsp;dev &middot; <a href="https://timonsh.dev" rel="noopener">timonsh.dev</a></p>
+  <span class="studio-badge__grid" aria-hidden="true"></span>
+  <span class="studio-badge__aura" aria-hidden="true"></span>
+  <span class="studio-badge__scan" aria-hidden="true"></span>
+  <span class="studio-badge__flames" aria-hidden="true"></span>
+  <canvas class="studio-badge__flame-canvas" aria-hidden="true"></canvas>
+
+  <div class="studio-badge__main">
+    <span class="studio-badge__dots" aria-hidden="true">
+      <span class="studio-badge__dot studio-badge__dot--red"></span>
+      <span class="studio-badge__dot studio-badge__dot--amber"></span>
+      <span class="studio-badge__dot studio-badge__dot--green"></span>
+    </span>
+
+    <div class="studio-badge__text">
+      <p class="studio-badge__line">
+        <span class="studio-badge__prompt" aria-hidden="true">&#10095;</span>
+        <span class="studio-badge__cmd">gebaut von</span>
+        <a class="studio-badge__brand" href="https://timonsh.dev" rel="noopener">
+          <span class="studio-badge__brand-word" aria-hidden="true">WebByte&nbsp;Studio</span>
+          <span class="studio-badge__logo" aria-hidden="true">
+            <img src="webbyte-mark.webp" alt="" width="560" height="324" loading="lazy" decoding="async">
+          </span>
+          <span class="studio-badge__sr">WebByte Studio</span>
+        </a>
+        <span class="studio-badge__caret" aria-hidden="true"></span>
+      </p>
+      <p class="studio-badge__meta">
+        <a class="is-name" href="https://timonsh.dev" rel="noopener">timon schroth</a>
+        <span class="studio-badge__sep" aria-hidden="true">&middot;</span> frontend&nbsp;dev
+        <span class="studio-badge__sep" aria-hidden="true">&middot;</span>
+        <a class="is-site" href="https://timonsh.dev" rel="noopener">timonsh.dev</a>
+      </p>
+    </div>
   </div>
+
   <a class="studio-badge__avatar" href="https://timonsh.dev" rel="noopener" aria-label="timonsh.dev — Profil">
-    <img src="timon-profile.webp" alt="Timon Schroth" width="144" height="144" loading="lazy">
+    <span class="studio-badge__avatar-ring" aria-hidden="true"></span>
+    <img src="timon-profile.webp" alt="Timon Schroth" width="144" height="144" loading="lazy" decoding="async">
   </a>
 </aside>

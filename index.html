@@ -5,56 +5,186 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebByte Studio Tag</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="studio-badge.css">
     <style>
+        :root { color-scheme: dark; }
+
         body {
             margin: 0;
-            background: #fff;
-            color: #241f18;
-            font-family: system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            background:
+                radial-gradient(80% 60% at 50% -10%, rgba(42, 69, 248, .18), transparent 60%),
+                radial-gradient(60% 50% at 100% 100%, rgba(63, 185, 80, .08), transparent 60%),
+                radial-gradient(60% 50% at 0% 100%, rgba(247, 129, 102, .08), transparent 60%),
+                #05070f;
+            color: #e6edf3;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            /* Custom-Cursor auch auf der Showcase-Seite */
+            cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cpath%20d='M5%202.5%20L5%2021.5%20L10.2%2016.7%20L13.6%2022.8%20L16.6%2021.1%20L13.2%2015.2%20L20%2015%20Z'%20fill='%23f78166'%20stroke='%2305070f'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, auto;
         }
 
+        a { cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cpath%20d='M5%202.5%20L5%2021.5%20L10.2%2016.7%20L13.6%2022.8%20L16.6%2021.1%20L13.2%2015.2%20L20%2015%20Z'%20fill='%237ea5ff'%20stroke='%2305070f'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, pointer; }
+
         .wrap {
-            max-width: 760px;
+            max-width: 780px;
             margin: 0 auto;
-            padding: 3rem 1.25rem 5rem;
+            padding: 3.5rem 1.25rem 6rem;
+        }
+
+        .eyebrow {
+            font-size: .78rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: #7ea5ff;
+            margin: 0 0 .4rem;
         }
 
         h1 {
-            font-size: 1.4rem;
-            margin-bottom: .25rem;
+            font-size: clamp(1.4rem, 1.1rem + 1.8vw, 2rem);
+            margin: 0 0 .5rem;
+            text-wrap: balance;
+            color: #fff;
         }
 
         p.note {
-            color: #555;
-            margin-top: 0;
+            color: #8a97ad;
+            margin: 0;
+            line-height: 1.65;
+            max-width: 60ch;
         }
 
+        .hint { color: #6a7690; font-size: .8rem; }
+
         code {
-            background: #f2f2f4;
-            padding: .1em .35em;
-            border-radius: 5px;
+            background: #161b26;
+            padding: .12em .4em;
+            border-radius: 6px;
             font-size: .9em;
+            color: #a8c0ff;
         }
+
+        .panel-label {
+            margin: 3.2rem 0 .6rem;
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #6a7690;
+        }
+
+        /* Nachweis der Eigenständigkeit: auch auf hellem Host unverändert */
+        .light-host {
+            background: #f5f6f8;
+            border-radius: 18px;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .light-host .studio-badge { margin-top: 1.5rem; }
     </style>
 </head>
 
 <body>
     <div class="wrap">
+        <p class="eyebrow">tag.timonsh.dev</p>
+        <h1>WebByte Studio — Tag</h1>
+        <p class="note">
+            Zentral gehostete „gebaut von“-Badge. Einbinden mit
+            <code>&lt;script src="https://tag.timonsh.dev/tag.js" defer&gt;&lt;/script&gt;</code>
+            und <code>&lt;div data-webbyte-studio-tag&gt;&lt;/div&gt;</code>.
+            <br><span class="hint">Balatro-Flammen vom Avatar · getippte Wortmarke · leichter Lift &amp; Tilt · WebByte-Blau · Grün · Orange. Fahre mit der Maus über die Badge.</span>
+        </p>
 
+        <p class="panel-label">Vorschau — dunkler Host</p>
         <aside class="studio-badge" aria-label="Erstellt von WebByte Studio">
-            <div class="studio-badge__text">
-                <p class="studio-badge__line"><span class="studio-badge__prompt">&#10095;</span> gebaut von <a
-                        href="https://timonsh.dev" rel="noopener">WebByte&nbsp;Studio</a></p>
-                <p class="studio-badge__meta">timon schroth &middot; frontend&nbsp;dev &middot; <a
-                        href="https://timonsh.dev" rel="noopener">timonsh.dev</a></p>
+            <span class="studio-badge__grid" aria-hidden="true"></span>
+            <span class="studio-badge__aura" aria-hidden="true"></span>
+            <span class="studio-badge__scan" aria-hidden="true"></span>
+            <span class="studio-badge__flames" aria-hidden="true"></span>
+            <canvas class="studio-badge__flame-canvas" aria-hidden="true"></canvas>
+
+            <div class="studio-badge__main">
+                <span class="studio-badge__dots" aria-hidden="true">
+                    <span class="studio-badge__dot studio-badge__dot--red"></span>
+                    <span class="studio-badge__dot studio-badge__dot--amber"></span>
+                    <span class="studio-badge__dot studio-badge__dot--green"></span>
+                </span>
+
+                <div class="studio-badge__text">
+                    <p class="studio-badge__line">
+                        <span class="studio-badge__prompt" aria-hidden="true">&#10095;</span>
+                        <span class="studio-badge__cmd">gebaut von</span>
+                        <a class="studio-badge__brand" href="https://timonsh.dev" rel="noopener">
+                            <span class="studio-badge__brand-word" aria-hidden="true">WebByte&nbsp;Studio</span>
+                            <span class="studio-badge__logo" aria-hidden="true">
+                                <img src="webbyte-mark.webp" alt="" width="560" height="324" loading="lazy" decoding="async">
+                            </span>
+                            <span class="studio-badge__sr">WebByte Studio</span>
+                        </a>
+                        <span class="studio-badge__caret" aria-hidden="true"></span>
+                    </p>
+                    <p class="studio-badge__meta">
+                        <a class="is-name" href="https://timonsh.dev" rel="noopener">timon schroth</a>
+                        <span class="studio-badge__sep" aria-hidden="true">&middot;</span> frontend&nbsp;dev
+                        <span class="studio-badge__sep" aria-hidden="true">&middot;</span>
+                        <a class="is-site" href="https://timonsh.dev" rel="noopener">timonsh.dev</a>
+                    </p>
+                </div>
             </div>
+
             <a class="studio-badge__avatar" href="https://timonsh.dev" rel="noopener" aria-label="timonsh.dev — Profil">
-                <img src="timon-profile.webp" alt="Timon Schroth" width="144" height="144" loading="lazy">
+                <span class="studio-badge__avatar-ring" aria-hidden="true"></span>
+                <img src="timon-profile.webp" alt="Timon Schroth" width="144" height="144" loading="lazy" decoding="async">
             </a>
         </aside>
 
+        <p class="panel-label">Eigenständig auch auf hellem Host</p>
+        <div class="light-host">
+            <aside class="studio-badge" aria-label="Erstellt von WebByte Studio">
+                <span class="studio-badge__grid" aria-hidden="true"></span>
+                <span class="studio-badge__aura" aria-hidden="true"></span>
+                <span class="studio-badge__scan" aria-hidden="true"></span>
+                <span class="studio-badge__flames" aria-hidden="true"></span>
+                <canvas class="studio-badge__flame-canvas" aria-hidden="true"></canvas>
+
+                <div class="studio-badge__main">
+                    <span class="studio-badge__dots" aria-hidden="true">
+                        <span class="studio-badge__dot studio-badge__dot--red"></span>
+                        <span class="studio-badge__dot studio-badge__dot--amber"></span>
+                        <span class="studio-badge__dot studio-badge__dot--green"></span>
+                    </span>
+
+                    <div class="studio-badge__text">
+                        <p class="studio-badge__line">
+                            <span class="studio-badge__prompt" aria-hidden="true">&#10095;</span>
+                            <span class="studio-badge__cmd">gebaut von</span>
+                            <a class="studio-badge__brand" href="https://timonsh.dev" rel="noopener">
+                                <span class="studio-badge__brand-word" aria-hidden="true">WebByte&nbsp;Studio</span>
+                                <span class="studio-badge__logo" aria-hidden="true">
+                                    <img src="webbyte-mark.webp" alt="" width="560" height="324" loading="lazy" decoding="async">
+                                </span>
+                                <span class="studio-badge__sr">WebByte Studio</span>
+                            </a>
+                            <span class="studio-badge__caret" aria-hidden="true"></span>
+                        </p>
+                        <p class="studio-badge__meta">
+                            <a class="is-name" href="https://timonsh.dev" rel="noopener">timon schroth</a>
+                            <span class="studio-badge__sep" aria-hidden="true">&middot;</span> frontend&nbsp;dev
+                            <span class="studio-badge__sep" aria-hidden="true">&middot;</span>
+                            <a class="is-site" href="https://timonsh.dev" rel="noopener">timonsh.dev</a>
+                        </p>
+                    </div>
+                </div>
+
+                <a class="studio-badge__avatar" href="https://timonsh.dev" rel="noopener" aria-label="timonsh.dev — Profil">
+                    <span class="studio-badge__avatar-ring" aria-hidden="true"></span>
+                    <img src="timon-profile.webp" alt="Timon Schroth" width="144" height="144" loading="lazy" decoding="async">
+                </a>
+            </aside>
+        </div>
     </div>
+
+    <!-- dogfood: dasselbe Skript wertet die statischen Badges auf -->
+    <script src="tag.js" defer></script>
 </body>
 
 </html>

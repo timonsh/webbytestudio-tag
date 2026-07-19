@@ -1,96 +1,606 @@
 /* ============================================================================
    WebByte Studio — "gebaut von" Impressum-Tag  (.studio-badge)
    ----------------------------------------------------------------------------
-   Isolierte, eigenständige Komponente. 1:1 aus dem ethikseite-Projekt
-   extrahiert; alle CSS-Variablen des ursprünglichen Design-Systems wurden zu
-   festen Werten aufgelöst, damit die Komponente ohne Abhängigkeiten in jedem
-   Projekt identisch aussieht. Die font-family ist zusätzlich explizit auf allen
-   Textelementen gesetzt, damit ein globales `* { font-family }` des Hosts sie
-   nicht überschreibt.
+   Eigenständige, in sich geschlossene Komponente. Keine externen Variablen.
+
+   Design-Sprache 1:1 von timonsh.dev:
+     · Blau   #2a45f8 / #7ea5ff   (WebByte-Primary — Logo-Hintergrund)
+     · Grün   #3fb950             (Special / Terminal-Prompt)
+     · Orange #f78166             (Special / Caret + Flammen)
+
+   Features:
+     · Balatro-Flammen vom Avatar (rechts) nach links (Canvas via tag.js,
+       CSS-Ember-Fallback ohne JS) — Blau→Orange→Weiß mit grünen Funken.
+     · Terminal-Prompt "tippt" die Wortmarke (Typewriter via tag.js).
+     · Logo fließt als kleine Primary-Blau-Pille in die Wortmarke ein.
+     · Custom-Cursor (nur innerhalb der Badge), sehr leichter Lift/Float,
+       rotierender Conic-Rand, driftendes Grid, orbitierende Aura, Scanline.
+     · Viele, ineinandergreifende Hover-Effekte.
+   Alles hinter `prefers-reduced-motion` bzw. JS-Guards abgesichert. Die
+   Mono-Schrift ist explizit gesetzt, damit ein globales `* { font-family }`
+   des Hosts das Aussehen nicht verändert.
    ============================================================================ */
 
+@property --wbs-angle {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 0deg;
+}
+
 .studio-badge {
+    /* --- Palette als lokale Tokens --- */
+    --wbs-blue: #2a45f8;
+    --wbs-blue-lite: #7ea5ff;
+    --wbs-green: #3fb950;
+    --wbs-orange: #f78166;
+    --wbs-ink: #e8edf7;
+    --wbs-muted: #7d8eaf;
+    --wbs-surface: #080d1a;
+    --wbs-border: #1b2740;
+
+    /* --- Custom-Cursor (nur innerhalb der Badge, Host bleibt unberührt) --- */
+    --wbs-cursor: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cpath%20d='M5%202.5%20L5%2021.5%20L10.2%2016.7%20L13.6%2022.8%20L16.6%2021.1%20L13.2%2015.2%20L20%2015%20Z'%20fill='%23f78166'%20stroke='%2305070f'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, auto;
+    --wbs-cursor-link: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%20viewBox='0%200%2026%2026'%3E%3Cpath%20d='M5%202.5%20L5%2021.5%20L10.2%2016.7%20L13.6%2022.8%20L16.6%2021.1%20L13.2%2015.2%20L20%2015%20Z'%20fill='%237ea5ff'%20stroke='%2305070f'%20stroke-width='1.5'%20stroke-linejoin='round'/%3E%3C/svg%3E") 5 3, pointer;
+
     position: relative;
     isolation: isolate;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1.4rem;
     width: 100%;
     margin-top: 4.5rem;
-    padding: 0.7rem 1.05rem;
-    border: 1px solid #243450;
-    border-radius: 14px;
-    background: #0a0f1d;
-    color: #c7d2e0;
+    padding: 0.85rem 1.15rem;
+    border: 1px solid var(--wbs-border);
+    border-radius: 16px;
+    background:
+        radial-gradient(120% 140% at 100% 0%, rgba(63, 185, 80, .05), transparent 55%),
+        radial-gradient(120% 140% at 0% 100%, rgba(247, 129, 102, .05), transparent 55%),
+        var(--wbs-surface);
+    color: var(--wbs-ink);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem);
+    font-size: clamp(0.78rem, 0.74rem + 0.2vw, 0.88rem);
     line-height: 1.5;
-    box-shadow: 0 14px 38px rgba(6, 10, 22, .45);
+    cursor: var(--wbs-cursor);
+    box-shadow:
+        0 18px 48px rgba(4, 8, 20, .5),
+        inset 0 1px 0 rgba(255, 255, 255, .04);
+    /* Transform gehört im JS-Modus dem Skript (Float + Tilt); ohne JS greift
+       der :hover-Lift. transition schließt transform absichtlich mit ein –
+       tag.js setzt sie beim Init passend um. */
+    transition:
+        transform .45s cubic-bezier(.22, 1, .36, 1),
+        border-color .4s ease,
+        box-shadow .4s ease;
+    will-change: transform;
 }
 
+/* ---------- Rotierender Conic-Rand (Blau → Grün → Orange) ---------- */
 .studio-badge::before {
-    /* aura: blauer radialer Glow + feines Tech-Grid */
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: conic-gradient(from var(--wbs-angle),
+            var(--wbs-blue), var(--wbs-green), var(--wbs-orange),
+            var(--wbs-blue-lite), var(--wbs-blue));
+    -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    opacity: .5;
     pointer-events: none;
-    background:
-        radial-gradient(130% 160% at 93% 50%, rgba(91, 120, 255, .32), transparent 58%),
-        radial-gradient(90% 130% at -5% -30%, rgba(91, 120, 255, .12), transparent 55%),
-        linear-gradient(rgba(120, 150, 255, .045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(120, 150, 255, .045) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 22px 22px, 22px 22px;
+    transition: opacity .35s ease;
 }
+
+/* ---------- Ambient-Layer ---------- */
+.studio-badge__grid,
+.studio-badge__aura,
+.studio-badge__scan,
+.studio-badge__flames,
+.studio-badge__flame-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+/* feines Tech-Grid, driftet langsam */
+.studio-badge__grid {
+    background-image:
+        linear-gradient(rgba(126, 165, 255, .06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(126, 165, 255, .06) 1px, transparent 1px);
+    background-size: 24px 24px;
+    -webkit-mask: radial-gradient(120% 120% at 50% 50%, #000 55%, transparent 100%);
+    mask: radial-gradient(120% 120% at 50% 50%, #000 55%, transparent 100%);
+    opacity: .8;
+    transition: opacity .35s ease;
+}
+
+/* orbitierende Aura: drei Special-Glows */
+.studio-badge__aura {
+    background:
+        radial-gradient(38% 120% at 12% 30%, rgba(42, 69, 248, .34), transparent 60%),
+        radial-gradient(34% 120% at 50% 80%, rgba(63, 185, 80, .20), transparent 60%),
+        radial-gradient(40% 130% at 92% 45%, rgba(247, 129, 102, .20), transparent 62%);
+    background-size: 180% 180%;
+    filter: blur(6px);
+    opacity: .9;
+    transition: opacity .35s ease;
+}
+
+/* horizontale Scanline, wandert periodisch durch */
+.studio-badge__scan {
+    background: linear-gradient(90deg,
+            transparent 0%,
+            rgba(126, 165, 255, .10) 45%,
+            rgba(126, 165, 255, .16) 50%,
+            rgba(126, 165, 255, .10) 55%,
+            transparent 100%);
+    background-size: 45% 100%;
+    background-repeat: no-repeat;
+    background-position: -50% 0;
+    opacity: 0;
+}
+
+/* ---------- Balatro-Flammen ---------- */
+/* Canvas (von tag.js gezeichnet): additiv, weich, links ausblendend,
+   damit die Wortmarke lesbar bleibt. */
+.studio-badge__flame-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    mix-blend-mode: screen;
+    opacity: .48;
+    filter: blur(3.5px) saturate(1.03);
+    -webkit-mask: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .7) 22%, rgba(0, 0, 0, .28) 48%, transparent 72%);
+    mask: linear-gradient(to left, #000 0%, rgba(0, 0, 0, .7) 22%, rgba(0, 0, 0, .28) 48%, transparent 72%);
+}
+
+/* CSS-Ember-Fallback (ohne JS / reduced-motion): weicher Feuerschein vom
+   Avatar nach links. */
+.studio-badge__flames {
+    background:
+        radial-gradient(55% 120% at 100% 52%, rgba(247, 129, 102, .26), transparent 62%),
+        radial-gradient(44% 100% at 93% 40%, rgba(255, 214, 170, .18), transparent 60%),
+        radial-gradient(50% 115% at 90% 66%, rgba(42, 69, 248, .18), transparent 64%),
+        radial-gradient(28% 85% at 80% 58%, rgba(63, 185, 80, .11), transparent 62%);
+    mix-blend-mode: screen;
+    filter: blur(11px);
+    opacity: .55;
+    -webkit-mask: linear-gradient(to left, #000 6%, transparent 66%);
+    mask: linear-gradient(to left, #000 6%, transparent 66%);
+}
+
+/* Wenn Canvas-Flammen aktiv sind, blendet tag.js den CSS-Fallback aus. */
+.studio-badge.wbs-has-fire .studio-badge__flames { opacity: 0; }
+
+/* ---------- Inhalt ---------- */
+.studio-badge__main {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+}
+
+/* Terminal-„Ampel" */
+.studio-badge__dots {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: none;
+}
+
+.studio-badge__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 .5px rgba(0, 0, 0, .25);
+    transition: transform .25s cubic-bezier(.34, 1.56, .64, 1), box-shadow .25s ease;
+    cursor: var(--wbs-cursor);
+}
+
+.studio-badge__dot--red { background: #ff5f57; }
+.studio-badge__dot--amber { background: var(--wbs-orange); }
+.studio-badge__dot--green { background: var(--wbs-green); }
+
+.studio-badge__dot:hover { transform: scale(1.55); }
+.studio-badge__dot--red:hover { box-shadow: 0 0 12px 1px rgba(255, 95, 87, .95); }
+.studio-badge__dot--amber:hover { box-shadow: 0 0 12px 1px rgba(247, 129, 102, .95); }
+.studio-badge__dot--green:hover { box-shadow: 0 0 12px 1px rgba(63, 185, 80, .95); }
 
 .studio-badge__text {
     display: flex;
     flex-direction: column;
-    gap: 0.15rem;
+    gap: 0.18rem;
     min-width: 0;
 }
 
 .studio-badge__line,
 .studio-badge__meta,
 .studio-badge__prompt,
+.studio-badge__cmd,
+.studio-badge__brand-word,
 .studio-badge a {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-.studio-badge__line { margin: 0; color: #e8edf7; }
-.studio-badge__prompt { color: #6b8bff; font-weight: 700; margin-right: .4em; }
-.studio-badge__meta { margin: 0; color: #74859f; font-size: .85em; }
-.studio-badge a { color: #83a0ff; text-decoration: none; font-weight: 700; }
-.studio-badge a:hover { color: #aabcff; text-decoration: underline; }
-.studio-badge__meta a { font-weight: 600; }
+.studio-badge__line {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .45em;
+    color: var(--wbs-ink);
+}
 
-.studio-badge__avatar {
-    flex: none;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 11px;
+/* grüner Prompt mit atmendem Glow */
+.studio-badge__prompt {
+    color: var(--wbs-green);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(63, 185, 80, .55);
+    transition: text-shadow .3s ease, transform .3s ease;
+}
+
+.studio-badge__cmd { color: var(--wbs-muted); }
+
+/* ---------- Marken-Lockup: getippte Wortmarke + einfließendes Logo ---------- */
+.studio-badge__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .5em;
+    text-decoration: none;
+    line-height: 1;
+    padding: .1em .15em;
+    border-radius: 8px;
+    cursor: var(--wbs-cursor-link);
+    transition: filter .3s ease;
+}
+
+.studio-badge__brand-word {
+    font-weight: 700;
+    letter-spacing: .01em;
+    white-space: nowrap;
+    background: linear-gradient(100deg, #d4ddff 0%, #ffffff 45%, var(--wbs-blue-lite) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    transition: background .35s ease;
+}
+
+/* das Logo — Primary-WebByte-Blau als Hintergrund, weiße Wortmarke darauf */
+.studio-badge__logo {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 1.65em;
+    padding: 0 .62em;
+    border-radius: 999px;
     overflow: hidden;
-    border: 1px solid rgba(91, 120, 255, .5);
-    box-shadow: 0 0 0 3px rgba(91, 120, 255, .10), 0 0 24px rgba(60, 90, 255, .5);
+    background: var(--wbs-blue);
+    box-shadow:
+        0 2px 10px rgba(42, 69, 248, .5),
+        inset 0 0 0 1px rgba(255, 255, 255, .18),
+        inset 0 1px 0 rgba(255, 255, 255, .28);
+    transform: translateY(-.02em);
+    cursor: var(--wbs-cursor-link);
+    transition:
+        opacity .3s ease,
+        transform .35s cubic-bezier(.34, 1.56, .64, 1),
+        box-shadow .3s ease,
+        width .3s ease,
+        padding .3s ease;
+    flex: none;
+}
+
+.studio-badge__logo img {
+    height: .78em;
+    width: auto;
+    display: block;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .35));
+}
+
+/* ambient laufender Glanz auf der Pille */
+.studio-badge__logo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(60% 140% at 30% -20%, rgba(255, 255, 255, .5), transparent 60%);
+    opacity: .7;
+    pointer-events: none;
+}
+
+/* Glanz-Sweep (bei Hover) */
+.studio-badge__logo::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(255, 255, 255, .7), transparent);
+    transform: skewX(-18deg);
+    pointer-events: none;
+}
+
+/* ---------- oranger blinkender Caret ---------- */
+.studio-badge__caret {
+    display: inline-block;
+    width: 9px;
+    height: 1.05em;
+    background: var(--wbs-orange);
+    border-radius: 1.5px;
+    box-shadow: 0 0 10px rgba(247, 129, 102, .7);
+    transform: translateY(.12em);
+}
+
+/* ---------- Meta-Zeile ---------- */
+.studio-badge__meta {
+    margin: 0;
+    color: var(--wbs-muted);
+    font-size: .86em;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: .5em;
+}
+
+.studio-badge__sep { color: rgba(125, 142, 175, .5); }
+
+.studio-badge a {
+    color: var(--wbs-blue-lite);
+    text-decoration: none;
+    font-weight: 700;
+    position: relative;
+    cursor: var(--wbs-cursor-link);
+}
+
+.studio-badge__meta a {
+    font-weight: 600;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1.5px;
+    transition: color .25s ease, background-size .3s ease, text-shadow .25s ease;
+}
+
+.studio-badge__meta a:hover { background-size: 100% 1.5px; }
+.studio-badge__meta a.is-name:hover {
+    color: var(--wbs-green);
+    text-shadow: 0 0 10px rgba(63, 185, 80, .5);
+}
+.studio-badge__meta a.is-site:hover {
+    color: var(--wbs-orange);
+    text-shadow: 0 0 10px rgba(247, 129, 102, .5);
+}
+
+/* screen-reader-only (voller Markenname bleibt zugänglich) */
+.studio-badge__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------- Avatar (Feuerquelle rechts) ---------- */
+.studio-badge__avatar {
+    position: relative;
+    z-index: 3;
+    flex: none;
+    width: 3.15rem;
+    height: 3.15rem;
+    border-radius: 13px;
+    overflow: hidden;
+    border: 1px solid rgba(126, 165, 255, .5);
+    cursor: var(--wbs-cursor-link);
+    box-shadow: 0 0 0 3px rgba(42, 69, 248, .12), 0 0 22px rgba(42, 69, 248, .45);
+    transition: transform .35s cubic-bezier(.34, 1.56, .64, 1), box-shadow .35s ease;
+}
+
+/* rotierender Farbring hinter dem Avatar */
+.studio-badge__avatar-ring {
+    position: absolute;
+    inset: -40%;
+    z-index: 0;
+    background: conic-gradient(from var(--wbs-angle),
+            var(--wbs-blue), var(--wbs-green), var(--wbs-orange), var(--wbs-blue));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .35s ease;
 }
 
 .studio-badge__avatar img {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: inherit;
+    transition: filter .35s ease, transform .35s ease;
 }
 
+/* ============================================================================
+   TYPEWRITER-ZUSTÄNDE  (tag.js schaltet .is-typing um)
+   ============================================================================ */
+/* Während getippt wird: Caret leuchtet konstant, Logo eingeklappt. */
+.studio-badge.is-typing .studio-badge__caret { animation: none !important; opacity: 1; }
+.studio-badge.is-typing .studio-badge__logo {
+    opacity: 0;
+    width: 0;
+    padding: 0;
+    margin-left: -.5em;
+    transform: translateY(-.02em) scale(.4);
+    pointer-events: none;
+}
+
+/* ============================================================================
+   HOVER-EFFEKTE (viele, ineinandergreifend)
+   ============================================================================ */
+
+/* ohne JS: sanfter Lift; mit JS übernimmt das Skript den Transform */
+.studio-badge:hover {
+    transform: translateY(-3px) scale(1.008);
+    border-color: #2c3f63;
+    box-shadow:
+        0 30px 66px rgba(4, 8, 20, .62),
+        0 0 0 1px rgba(126, 165, 255, .14),
+        0 0 34px rgba(42, 69, 248, .28),
+        inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.studio-badge:hover::before { opacity: .95; }
+.studio-badge:hover .studio-badge__grid { opacity: 1; }
+.studio-badge:hover .studio-badge__aura { opacity: 1; }
+.studio-badge:hover .studio-badge__prompt {
+    transform: translateX(2px);
+    text-shadow: 0 0 16px rgba(63, 185, 80, .9);
+}
+
+/* Wortmarke: Verlauf schaltet auf Grün → Weiß → Orange */
+.studio-badge__brand:hover .studio-badge__brand-word {
+    background: linear-gradient(100deg, var(--wbs-green) 0%, #ffffff 50%, var(--wbs-orange) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+/* Logo-Pille: hebt & neigt sich, leuchtet mehrfarbig, Glanz zieht durch */
+.studio-badge__brand:hover .studio-badge__logo {
+    transform: translateY(-.14em) scale(1.08) rotate(-1.5deg);
+    box-shadow:
+        0 8px 22px rgba(42, 69, 248, .6),
+        0 4px 18px rgba(63, 185, 80, .3),
+        0 4px 18px rgba(247, 129, 102, .3),
+        inset 0 0 0 1px rgba(255, 255, 255, .35);
+}
+
+/* Avatar: Scale + Tilt + Ring erscheint + Multi-Color-Glow */
+.studio-badge__avatar:hover {
+    transform: translateY(-2px) scale(1.07) rotate(-2deg);
+    box-shadow:
+        0 0 0 3px rgba(63, 185, 80, .2),
+        0 0 26px rgba(247, 129, 102, .6),
+        0 0 44px rgba(42, 69, 248, .7);
+}
+
+.studio-badge__avatar:hover .studio-badge__avatar-ring { opacity: .38; }
+.studio-badge__avatar:hover img { filter: saturate(1.2) brightness(1.08); transform: scale(1.05); }
+
+/* ============================================================================
+   AMBIENT-ANIMATIONEN  (nur ohne reduced-motion)
+   ============================================================================ */
 @media (prefers-reduced-motion: no-preference) {
-    .studio-badge__avatar {
-        transition: transform .2s ease;
-        animation: studio-aura 3.4s ease-in-out infinite;
+
+    .studio-badge::before { animation: wbs-spin 9s linear infinite; }
+    .studio-badge:hover::before { animation-duration: 3.5s; }
+
+    .studio-badge__avatar-ring { animation: wbs-spin 9s linear infinite; }
+
+    .studio-badge__grid { animation: wbs-grid-drift 14s linear infinite; }
+
+    .studio-badge__aura { animation: wbs-aura-orbit 12s ease-in-out infinite; }
+
+    .studio-badge__scan { animation: wbs-scan 6.5s ease-in-out infinite; }
+
+    .studio-badge__flames { animation: wbs-ember 7.5s ease-in-out infinite; }
+
+    .studio-badge__caret { animation: wbs-blink 1s steps(2) infinite; }
+
+    .studio-badge__prompt { animation: wbs-prompt-pulse 3s ease-in-out infinite; }
+
+    .studio-badge__brand-word { animation: wbs-word-shimmer 7s ease-in-out infinite; }
+
+    .studio-badge__logo::before { animation: wbs-gloss 5s ease-in-out infinite; }
+
+    .studio-badge__avatar { animation: wbs-avatar-aura 3.6s ease-in-out infinite; }
+
+    .studio-badge__brand:hover .studio-badge__logo::after { animation: wbs-shine 1.1s ease-in-out; }
+}
+
+@keyframes wbs-spin {
+    to { --wbs-angle: 360deg; }
+}
+
+@keyframes wbs-grid-drift {
+    to { background-position: 24px 24px; }
+}
+
+@keyframes wbs-aura-orbit {
+    0% { background-position: 0% 50%; }
+    33% { background-position: 100% 20%; }
+    66% { background-position: 30% 100%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes wbs-scan {
+    0%, 12% { background-position: -60% 0; opacity: 0; }
+    20% { opacity: .8; }
+    45%, 100% { background-position: 160% 0; opacity: 0; }
+}
+
+@keyframes wbs-ember {
+    0%, 100% { opacity: .42; filter: blur(11px); }
+    50% { opacity: .62; filter: blur(13px); }
+}
+
+@keyframes wbs-blink {
+    50% { opacity: 0; }
+}
+
+@keyframes wbs-prompt-pulse {
+    0%, 100% { text-shadow: 0 0 8px rgba(63, 185, 80, .45); }
+    50% { text-shadow: 0 0 16px rgba(63, 185, 80, .85); }
+}
+
+@keyframes wbs-word-shimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes wbs-gloss {
+    0%, 100% { transform: translateX(-15%); opacity: .55; }
+    50% { transform: translateX(15%); opacity: .85; }
+}
+
+@keyframes wbs-avatar-aura {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(42, 69, 248, .12), 0 0 16px rgba(42, 69, 248, .4); }
+    33% { box-shadow: 0 0 0 3px rgba(63, 185, 80, .14), 0 0 26px rgba(63, 185, 80, .5); }
+    66% { box-shadow: 0 0 0 3px rgba(247, 129, 102, .14), 0 0 26px rgba(247, 129, 102, .5); }
+}
+
+@keyframes wbs-shine {
+    from { left: -60%; }
+    to { left: 120%; }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 480px) {
+    .studio-badge {
+        gap: 1rem;
+        padding: 0.8rem 0.95rem;
     }
-    .studio-badge__avatar:hover { transform: translateY(-1px) scale(1.04); }
-    @keyframes studio-aura {
-        0%, 100% { box-shadow: 0 0 0 3px rgba(91, 120, 255, .10), 0 0 16px rgba(60, 90, 255, .4); }
-        50%      { box-shadow: 0 0 0 3px rgba(91, 120, 255, .17), 0 0 32px rgba(60, 90, 255, .8); }
+    .studio-badge__main { gap: 0.7rem; }
+    .studio-badge__dots { flex-direction: row; }
+    .studio-badge__avatar {
+        width: 2.7rem;
+        height: 2.7rem;
     }
 }
